@@ -1,24 +1,23 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/aslampangestu/learn-golang/api-example/responses"
+	"github.com/aslampangestu/learn-golang/api-example/models"
+
+	"github.com/aslampangestu/learn-golang/api-example/controllers"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	//Route
-	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
-			data := responses.Response{
-				Code: http.StatusOK,
-				Body: "Pong",
-			}
-			json.NewEncoder(w).Encode(data)
-		}
-	})
+	mux := controllers.Register()
+	db := models.Connect()
+	// Run this in end of line
+	defer db.Close()
 	//Start Server
-	http.ListenAndServe("localhost:3000", mux)
+	fmt.Println("Server Start...")
+	log.Fatal(http.ListenAndServe("localhost:3000", mux))
 }
